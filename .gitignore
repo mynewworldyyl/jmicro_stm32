@@ -29,3 +29,8 @@ npm-debug.log*
 .idea/
 .output/
 jm_client/
+Objects/
+Listings/
+DebugConfig/
+Project.*
+
