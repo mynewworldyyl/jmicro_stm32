@@ -16,6 +16,8 @@ extern "C"
 {
 #endif
 
+ICACHE_FLASH_ATTR void jm_cfg_logInfo();
+		
 ICACHE_FLASH_ATTR void jm_cfg_enableSlog();
 
 ICACHE_FLASH_ATTR void jm_cfg_reset();
@@ -29,6 +31,10 @@ ICACHE_FLASH_ATTR void jm_cfg_load();
 ICACHE_FLASH_ATTR void jm_init_cfg(jm_mem_op *jmm, jm_hashmap_t *ps);
 
 ICACHE_FLASH_ATTR char* jm_cfg_getCmdPs(char *key);
+	
+#if JM_STM32 
+ICACHE_FLASH_ATTR BOOL get_unique_id(uint32_t *id);	
+#endif
 
 #ifdef __cplusplus
 }

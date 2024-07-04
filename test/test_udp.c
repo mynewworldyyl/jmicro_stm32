@@ -26,9 +26,9 @@ ICACHE_FLASH_ATTR void _jm_udp_serialproxy_key_listener(jm_event_t *evt) {
 
 void jm_test_udp_init(){
 	SINFO("jm_test_udp_init B\n");
-	//jm_cli_getJmm()->jm_regEventListener(TASK_APP_SERIAL, _jm_udp_serialproxy_listener);
+	//jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_SERIAL, _jm_udp_serialproxy_listener);
 	
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_KEY, _jm_udp_serialproxy_key_listener);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_KEY, _jm_udp_serialproxy_key_listener);
 	
 	jm_udp_setDataCb(_jm_udp_testOnData);
 	SINFO("jm_test_udp_init E\n");

@@ -18,16 +18,16 @@
 #include "stm32_adapter.h"
 #endif
 
-#define CFG_DEBUG_ENABLE 0
-#define CFG_ERROR_ENABLE 1
+#define JM_CFG_DEBUG_ENABLE 1
+#define JM_CFG_ERROR_ENABLE 1
 
-#if CFG_DEBUG_ENABLE==1
+#if JM_CFG_DEBUG_ENABLE==1
 #define JM_CFG_DEBUG(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_CFG_DEBUG(format, ...)
 #endif
 
-#if CFG_ERROR_ENABLE==1
+#if JM_CFG_ERROR_ENABLE==1
 #define JM_CFG_ERROR(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_CFG_ERROR(format, ...)
@@ -41,8 +41,10 @@ sys_config_t sysCfg;
 
 static jm_hashmap_t *cmdPs;
 
-ICACHE_FLASH_ATTR static void _cfg_logInfo(){
+ICACHE_FLASH_ATTR void jm_cfg_logInfo(){
   
+	//JM_SERIAL_DEBUG("slogEnable=%d\n",sysCfg.slogEnable);
+	
     JM_CFG_DEBUG("deviceTypeName=%s\n",sysCfg.deviceTypeName);
     JM_CFG_DEBUG("device_id=%s\n",sysCfg.deviceId);
     JM_CFG_DEBUG("inited=%d\n",sysCfg.inited);
@@ -57,9 +59,8 @@ ICACHE_FLASH_ATTR static void _cfg_logInfo(){
     JM_CFG_DEBUG("clientId=%ld\n",sysCfg.clientId);
     JM_CFG_DEBUG("groupId=%d\n",sysCfg.grpId);
 	
-#ifndef JM_STM32
 	JM_CFG_DEBUG("actId=%ld\n",sysCfg.actId);
-	JM_CFG_DEBUG("cfg_holder=%d\n",sysCfg.cfg_holder);
+	//JM_CFG_DEBUG("cfg_holder=%d\n",sysCfg.cfg_holder);
 	JM_CFG_DEBUG("jlogHost=%s\n",sysCfg.jlogHost);
     JM_CFG_DEBUG("jlogPort=%u\n",sysCfg.jlogPort);
     JM_CFG_DEBUG("use_udp=%d\n",sysCfg.useUdp);
@@ -74,7 +75,9 @@ ICACHE_FLASH_ATTR static void _cfg_logInfo(){
     JM_CFG_DEBUG("sta_type=%d\n",sysCfg.sta_type);
     JM_CFG_DEBUG("sta_useStore=%d\n",sysCfg.sta_useStore);
 	JM_CFG_DEBUG("jmDomain=%s\n",sysCfg.jmDomain);
-#endif
+	
+	JM_CFG_DEBUG("devUid=%d\n",sysCfg.devUid);
+
 
 }
 
@@ -94,13 +97,13 @@ ICACHE_FLASH_ATTR void jm_cfg_load(){
 	JM_CFG_DEBUG("cfg_load name:%d size: %u\n",CFG_BLOCK_NO, sizeof(sysCfg));
     BOOL rst = fs_read(CFG_BLOCK_NO, (uint8 *)&sysCfg, sizeof(sysCfg));
     JM_CFG_DEBUG("cfg_load r:%d\n", rst);
-    _cfg_logInfo();
+    jm_cfg_logInfo();
 
     //int file_read(char *filePath, void *mem, unsigned int byteSize);
     /*  cfgPath = fp;
     int rst = file_read(cfgPath, (void*)&sysCfg, sizeof(sysCfg));
     JM_CFG_DEBUG("读配置文件结果：%d\n", rst);
-    _cfg_logInfo(); 
+    jm_cfg_logInfo(); 
     */
 }
 
@@ -112,6 +115,7 @@ ICACHE_FLASH_ATTR static void _cfg_merge(){
     jm_hashmap_t *ps = cmdPs;
 
     if(ps == NULL) return;
+	
 #ifndef JM_STM32
     if(jm_hashmap_exist(ps,"devicePort")) {
         char *str = jm_hashmap_get(ps,"devicePort");
@@ -285,8 +289,8 @@ ICACHE_FLASH_ATTR void  jm_cfg_reset(){
     //JM_CFG_DEBUG("cfg_reset _cfg_merge\n");
     _cfg_merge();
 
-    JM_CFG_DEBUG("cfg_reset _cfg_logInfo\n");
-    _cfg_logInfo();
+    JM_CFG_DEBUG("cfg_reset jm_cfg_logInfo\n");
+    jm_cfg_logInfo();
 
     //JM_CFG_DEBUG("cfg_reset cfg_save beg\n");
     jm_cfg_save();
@@ -304,6 +308,48 @@ ICACHE_FLASH_ATTR void jm_cfg_enableSlog(){
 	sysCfg.jlogEnable = true;
 }
 
+#if defined(STM32F10X_CL) || defined(STM32F10X_LD_VL) || defined(STM32F10X_MD) || defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_HD_VL)
+
+#include "stm32f10x.h"
+ 
+BOOL get_unique_id(uint32_t *id) {
+    id[0] = *(uint32_t *)0x1FFFF7E8;
+    id[1] = *(uint32_t *)0x1FFFF7EC;
+    id[2] = *(uint32_t *)0x1FFFF7F0;
+	return true;
+}
+ 
+#elif defined(STM32F40_41xxx) || defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F401xx) || defined(STM32F446) || defined(STM32F469_479xx)
+ 
+#include "stm32f4xx.h"
+ 
+BOOL get_unique_id(uint32_t *id) {
+    id[0] = *(uint32_t *)0x1FFF7A10;
+    id[1] = *(uint32_t *)0x1FFF7A14;
+    id[2] = *(uint32_t *)0x1FFF7A18;
+    id[3] = *(uint32_t *)0x1FFF7A1C;
+	return true;
+}
+ 
+#elif defined(STM32H743xx) || defined(STM32H750xx)
+ 
+#include "stm32h743xx.h"
+ 
+BOOL get_unique_id(uint32_t *id) {
+    id[0] = *(uint32_t *)0x1FFF7A10;
+    id[1] = *(uint32_t *)0x1FFF7A14;
+    id[2] = *(uint32_t *)0x1FFF7A18;
+    id[3] = *(uint32_t *)0x1FFF7A1C;
+	return true;
+}
+ 
+#else
+#error "Unsupported STM32 microcontroller"
+BOOL get_unique_id(uint32_t *id) {
+	return false;
+}
+#endif
+ 
 ICACHE_FLASH_ATTR void jm_init_cfg(jm_mem_op *jmm, jm_hashmap_t *ps){
 
     JM_CFG_DEBUG("init_cfg init\n");
@@ -313,34 +359,11 @@ ICACHE_FLASH_ATTR void jm_init_cfg(jm_mem_op *jmm, jm_hashmap_t *ps){
 
     jmm->jm_memset(&sysCfg, 0, sizeof(sysCfg));
 
-    jm_cfg_enableSlog();
-
-    if(!fs_exist(CFG_BLOCK_NO)) {
-        //JM_CFG_DEBUG("init_cfg first runing\n");
-        JM_CFG_DEBUG("init_cfg reset config %d\n",CFG_BLOCK_NO);
-        jm_cfg_reset();
-    } else {
-    	//sysCfg.slogEnable=true;
-        //fs_readFile(CMD_FILE_NAME, &localCmds,0, sizeof(localCmds));
-    	JM_CFG_DEBUG("init_cfg load config %d\n",CFG_BLOCK_NO);
-        jm_cfg_load();
-
-        if(sysCfg.inited == 255 || sysCfg.inited == 0){
-        	JM_CFG_DEBUG("init_cfg reset cfg %d\n",CFG_BLOCK_NO);
-        	jm_cfg_reset();
-        }
-    }
-
+     jm_cfg_reset();
+	
     _cfg_merge();
-
-#ifndef JM_STM32
-     os_sprintf(sysCfg.jmDomain, "jmicro.cn");
-#endif
-	 os_sprintf(sysCfg.jmHost, "47.107.141.158");
-	 //os_sprintf(sysCfg.jmHost, "192.168.3.4");
-	 os_sprintf(sysCfg.invokeCode, "20c3af27a2a10471a2ecfbbbef2bbaf5");
-	 os_sprintf(sysCfg.deviceId, "AAAAAAAAABc=");
-	 sysCfg.actId = 809;
+	
+	jm_cfg_enableSlog();
 
     //sysCfg.slogEnable = 1;
     //sysCfg.jlogEnable = 0;

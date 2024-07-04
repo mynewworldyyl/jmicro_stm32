@@ -44,7 +44,7 @@ static void _jm_rpc_serialproxy_key_listener(jm_event_t *evt) {
 }
 
 void jm_test_rpc_init(){
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_KEY, _jm_rpc_serialproxy_key_listener);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_KEY, _jm_rpc_serialproxy_key_listener);
 }
 
 #endif //JM_TEST_RPC_ENABLE==1

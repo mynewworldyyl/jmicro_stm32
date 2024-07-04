@@ -12,6 +12,8 @@ extern void jm_runner_init();
 
 ICACHE_FLASH_ATTR void jm_runner_setEventParam(jm_mem_op *jmm);
 
+static BOOL netCardConnected = false;
+
 static void _jm_onUartData(uint8_t uartNo, uint8_t byte) {
 	JM_MAIN_DEBUG("rd uartNo=%d data=%d\n",uartNo, byte);
 	/*
@@ -27,7 +29,7 @@ static void _jm_onUartData(uint8_t uartNo, uint8_t byte) {
 	
 	jm_cli_getJmm()->jm_memcpy(data, d, l);
 	
-	user_postEvent(TASK_APP_RX_DATA, 1, data, JM_EVENT_FLAG_FREE_DATA);
+	user_postEvent(JM_TASK_APP_RX_DATA, 1, data, JM_EVENT_FLAG_FREE_DATA);
 	*/
 }
 
@@ -35,7 +37,7 @@ ICACHE_FLASH_ATTR static void _error_resetSystem(char *cause) {
 	 JM_MAIN_ERROR("_error_resettSystem\n");
 	 JM_MAIN_ERROR("cause=%s\n",cause);
 	 //system_restart();
-	 jm_cli_getJmm()->jm_postEvent(TASK_APP_RESTART_SYSTEM, 1, NULL, JM_EVENT_FLAG_DEFAULT);
+	 jm_cli_getJmm()->jm_postEvent(JM_TASK_APP_RESTART_SYSTEM, 1, NULL, JM_EVENT_FLAG_DEFAULT);
 }
 
 ICACHE_FLASH_ATTR static void _jm_delay(uint32_t ms) {
@@ -52,14 +54,30 @@ void TIM3_IRQHandler(void)
 }
 
 ICACHE_FLASH_ATTR void jm_loop() {
+	if(!netCardConnected) {
+		//SINFO("UniqueId0\n");
+		static uint32_t lastCallTime = 0;
+		if(jm_cli_getSysTime()-lastCallTime > 1000) {
+			netCardConnected = true;
+			SINFO("UniqueId1\n");
+			jm_serial_sendUniqueId();
+			lastCallTime = jm_cli_getSysTime();
+		}	
+	}
 	jm_runEvent();
 	IWDG_ReloadCounter();
+}
+
+ICACHE_FLASH_ATTR void jm_netcard_connected(){
+	netCardConnected = true;
 }
 
 ICACHE_FLASH_ATTR void jm_setup(){
 	
 	//日志输出
 	Serial_Init(JM_UART1, _jm_onUartData, JM_UART_PRO_NOMAL);
+	
+	jm_cfg_enableSlog();
 	
 	if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST)==SET) {
 		JM_MAIN_ERROR("Reset by IWDG\n");
@@ -77,8 +95,6 @@ ICACHE_FLASH_ATTR void jm_setup(){
 	
 	IWDG_Enable();
 
-	jm_cfg_enableSlog();
-	
 	jm_mem_op jmm;
 	jmm.jm_free_fn = mem_free;
 	jmm.jm_realloc_fn = realloc;
@@ -108,7 +124,7 @@ ICACHE_FLASH_ATTR void jm_setup(){
 	jm_cli_init();
 	
 //udp代理
-#if UDP_ENABLE==1
+#if JM_UDP_ENABLE==1
 	jm_udpclient_init(JM_UART2);
 #endif
 

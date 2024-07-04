@@ -10,7 +10,7 @@
 #include "Serial.h"
 #include "jm_net.h"
 
-#if UDP_ENABLE==1
+#if JM_UDP_ENABLE==1
 
 int8_t jmUartNo = -1;
 static int8_t sendChannelNo = 0;
@@ -302,17 +302,27 @@ os_printf("\n");
 	
 	if(type == JM_SERIALNET_TYPE_UDP || type == JM_SERIALNET_TYPE_UDP_COM) {
 		//if(jm_upd_onData)
+		#if JM_UDP_ENABLE==1
 			_jm_upd_onData(host, port, readBuf);
-		//else
-			//JM_UDP_ERROR("UDP No jm_upd_onData host=%s port=%u\n",host, port);
+		#else
+			JM_UDP_ERROR("UDP Dis\n");
+		#endif //#if JM_UDP_ENABLE==1
 	} else if(type == JM_SERIALNET_TYPE_TCP) {
+		#if JM_TCP_ENABLE==1
 		//if(jm_tcp_onData)
 			jm_tcp_onData(host, port, readBuf);
+		#else
+		JM_TCP_ERROR("TCP Dis\n");
 		//else 
 			//JM_UDP_ERROR("TCP no jm_tcp_onData host=%s port=%u\n",host, port);
+		#endif //JM_TCP_ENABLE==1
 	} else { 
-			//type == JM_SERIALNET_TYPE_SERIAL
+		//type == JM_SERIALNET_TYPE_SERIAL
+		#if JM_SERIAL_ENABLE==1
 			jm_serial_onData(readBuf);
+		#else
+			JM_SERIAL_ERROR("SERIAL Dis\n");
+		#endif //#if JM_SERIAL_ENABLE==1
 	}
 	
 	jm_buf_release(readBuf);
@@ -334,23 +344,23 @@ void ICACHE_FLASH_ATTR jm_udpclient_init(int8_t uno){
 	Serial_Init(jmUartNo, NULL, JM_UART_PRO_NETPCK);
 	
 	//接收串口过来的数据包
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_RX_DATA, _jm_udpServerRecvData);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_RX_DATA, _jm_udpServerRecvData);
 	
 	//向外提供UDP发送接口，将数据通过串口发送出去
 	sendChannelNo = jm_cli_registSenderChannel(_jm_upd_sendMsg, JM_UDP_SENDER_NAME);
 	
-#if SERIAL_ENABLE==1
+#if JM_SERIAL_ENABLE==1
 	jm_serial_init();
 #endif
 	
-#if TCP_ENABLE==1
+#if JM_TCP_ENABLE==1
 	jm_tcp_init();
 #endif
 	
 	//UDP连接成功
-	jm_cli_getJmm()->jm_postEvent(TASK_APP_UDP, NetConnected, NULL , 0);
+	jm_cli_getJmm()->jm_postEvent(JM_TASK_APP_UDP, NetConnected, NULL , 0);
 	
 	JM_UDP_DEBUG("udp init E\n");
 }
 
-#endif //UDP_ENABLE==1
+#endif //JM_UDP_ENABLE==1

@@ -5,6 +5,45 @@
 #define JM_STM32 1
 #endif
 
+#ifndef SLOG_ENABLE
+#define SLOG_ENABLE 0
+#endif
+
+//不开启心跳，ESP32心跳由网卡负责
+#define JM_HB_ENABLE 0
+
+//ESP32登录由网卡负责
+#define JM_LOGIN_ENABLE 0
+
+// 1~20  8266系列
+// 21~40 ESP32系列
+// 41~50 STM32系列
+#ifndef BOARD_TYPE
+#define BOARD_TYPE 41 //F10X系列
+#endif
+
+#if defined(STM32F10X_CL) || defined(STM32F10X_LD_VL) || defined(STM32F10X_MD) || defined(STM32F10X_HD) || defined(STM32F10X_XL) || defined(STM32F10X_HD_VL)
+#define JM_UNIQUE_ID_LEN 12 
+#else
+#define JM_UNIQUE_ID_LEN 16 
+#endif
+
+#ifndef JM_SERIAL_ENABLE
+#define JM_SERIAL_ENABLE 1
+#endif
+
+#if JM_SERIAL_ENABLE==1
+
+#ifndef JM_TCP_ENABLE
+#define JM_TCP_ENABLE 0
+#endif
+
+#ifndef JM_UDP_ENABLE
+#define JM_UDP_ENABLE 1
+#endif
+
+#endif //JM_SERIAL_ENABLE==1
+
 #ifndef DEBUG_MEMORY
 #define DEBUG_MEMORY 0
 #endif
@@ -49,61 +88,61 @@
 #define JM_STD_TIME_ENABLE 1
 #endif
 
-#define CLI_DEBUG_ENABLE 0
-#define CLI_ERROR_ENABLE 1
+#define JM_CLI_DEBUG_ENABLE 0
+#define JM_CLI_ERROR_ENABLE 1
 
-#define BUF_DEBUG_ENABLE 0
-#define BUF_ERROR_ENABLE 0
+#define JM_BUF_DEBUG_ENABLE 0
+#define JM_BUF_ERROR_ENABLE 1
 
-#define MSG_DEBUG_ENABLE 0
-#define MSG_ERROR_ENABLE 0
+#define JM_MSG_DEBUG_ENABLE 0
+#define JM_MSG_ERROR_ENABLE 0
 
-#define MEM_DEBUG_ENABLE 0
-#define MEM_ERROR_ENABLE 0
+#define JM_MEM_DEBUG_ENABLE 0
+#define JM_MEM_ERROR_ENABLE 0
 
-#define STD_DEBUG_ENABLE 0
-#define STD_ERROR_ENABLE 0
+#define JM_STD_DEBUG_ENABLE 0
+#define JM_STD_ERROR_ENABLE 0
 
-#define TCP_DEBUG_ENABLE 0
-#define TCP_ERROR_ENABLE 0
+#define JM_TCP_DEBUG_ENABLE 0
+#define JM_TCP_ERROR_ENABLE 0
 
-#define SERIAL_DEBUG_ENABLE 0
-#define SERIAL_ERROR_ENABLE 1
+#define JM_SERIAL_DEBUG_ENABLE 1
+#define JM_SERIAL_ERROR_ENABLE 1
 
-#define UDP_DEBUG_ENABLE 0
-#define UDP_ERROR_ENABLE 1
+#define JM_UDP_DEBUG_ENABLE 1
+#define JM_UDP_ERROR_ENABLE 1
 
-#if TCP_DEBUG_ENABLE==1
+#if JM_TCP_DEBUG_ENABLE==1
 #define JM_TCP_DEBUG(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_TCP_DEBUG(format, ...)
 #endif
 
-#if TCP_ERROR_ENABLE==1
+#if JM_TCP_ERROR_ENABLE==1
 #define JM_TCP_ERROR(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_TCP_ERROR(format, ...)
 #endif
 
-#if UDP_DEBUG_ENABLE==1
+#if JM_UDP_DEBUG_ENABLE==1
 #define JM_UDP_DEBUG(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_UDP_DEBUG(format, ...)
 #endif
 
-#if UDP_ERROR_ENABLE==1
+#if JM_UDP_ERROR_ENABLE==1
 #define JM_UDP_ERROR(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_UDP_ERROR(format, ...)
 #endif
 
-#if SERIAL_DEBUG_ENABLE==1
+#if JM_SERIAL_DEBUG_ENABLE==1
 #define JM_SERIAL_DEBUG(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_SERIAL_DEBUG(format, ...)
 #endif
 
-#if SERIAL_ERROR_ENABLE==1
+#if JM_SERIAL_ERROR_ENABLE==1
 #define JM_SERIAL_ERROR(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_SERIAL_ERROR(format, ...)

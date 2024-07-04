@@ -10,7 +10,7 @@
 #include "Serial.h"
 #include "jm_net.h"
 
-#if TCP_ENABLE==1
+#if JM_TCP_ENABLE==1
 
 extern int8_t jmUartNo;
 static int8_t sendChannelNo = 0;
@@ -129,4 +129,4 @@ void ICACHE_FLASH_ATTR jm_tcp_init(){
 	JM_TCP_DEBUG("tcp init E\n");
 }
 
-#endif //TCP_ENABLE==1
+#endif //JM_TCP_ENABLE==1

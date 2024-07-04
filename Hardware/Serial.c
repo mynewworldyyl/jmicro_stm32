@@ -57,7 +57,6 @@ static int8_t uart1ProType = JM_UART_PRO_NOMAL;
 static int8_t uart2ProType = JM_UART_PRO_NETPCK;
 
 //USART_TypeDef* uartNo
-
 void Serial_Init(uint8_t uartNo, Serial_onByteData dcb, int8_t proType)
 {
 	if(uartNo == JM_UART1){
@@ -289,7 +288,7 @@ void USART1_IRQHandler(void)
 		jm_buf_put_u8(buf,byte);
 		if(jm_buf_is_full(buf)) {
 			//Serial_Printf("Finish uartNo=%d\n",JM_UART1);
-			jm_cli_getJmm()->jm_postEvent(TASK_APP_RX_DATA, JM_UART1, buf, JM_EVENT_FLAG_DEFAULT);
+			jm_cli_getJmm()->jm_postEvent(JM_TASK_APP_RX_DATA, JM_UART1, buf, JM_EVENT_FLAG_DEFAULT);
 			buf = NULL;
 			dataSize = 0;
 			hs = 0;
@@ -401,7 +400,7 @@ void USART2_IRQHandler(void)
 			
 			#endif //UDP_DEBUG_ENABLE
 
-			jm_cli_getJmm()->jm_postEvent(TASK_APP_RX_DATA, dataSize, (void*)((uint32)bufIdx), 0);
+			jm_cli_getJmm()->jm_postEvent(JM_TASK_APP_RX_DATA, dataSize, (void*)((uint32)bufIdx), 0);
 			
 			bufIdx = bufIdx==0?1:0;
 			if(bufIdx) {
@@ -427,97 +426,5 @@ void USART2_IRQHandler(void)
 	}
 	
 }
-
-/*
-
-static uint8_t *recvBuf = NULL;
-
-void USART2_IRQHandler(void)
-{
-	
-	if(USART_GetITStatus(USART2, USART_IT_RXNE) != SET){
-		return;
-	}
-	
-	//static USART_TypeDef* uartNo = USART2;
-	uint8_t byte = USART_ReceiveData(USART2);
-	
-	if(uart2ProType == JM_UART_PRO_NOMAL) {
-		if(uart2ByteCb) uart2ByteCb(JM_UART2, byte);
-		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
-	} else {
-		
-		static uint16_t dataSize = 0;
-		static uint16_t idx = 0;
-		static uint8_t ds = 0;
-		static uint64_t lastRecvTime = 0;
-		
-		if(lastRecvTime && (jm_cli_getSysTime() - lastRecvTime) > RECV_TIMEOUT) {
-			dataSize = 0;
-			idx = 0;
-			ds = 0;
-			if(recvBuf) free(recvBuf);
-			recvBuf = NULL;
-		}
-		
-		lastRecvTime = jm_cli_getSysTime();
-		//SINFO("recvBuf=%u dataSize=%d hs=%d\n",byte, dataSize, hs);
-	
-		if(ds < 2) {
-			if(ds == 0) {
-				ds=1;
-				dataSize = byte << 8;
-				USART_ClearITPendingBit(USART2, USART_IT_RXNE);
-				return;
-			}else if(ds == 1) {	
-				dataSize |= byte;
-				//前两个字节是包的长度，最大65535个字节
-				if(dataSize > MAX_SIZE || dataSize == 0) {
-					SINFO("tlong ds=%u max=%d\n",dataSize,MAX_SIZE);
-					dataSize = 0;
-					idx = 0;
-					ds = 0;
-					//SINFO("ds=%d\n",dataSize);
-					USART_ClearITPendingBit(USART2, USART_IT_RXNE);
-					return;
-				}
-				
-				ds=2;//gotSize最大值是2，表示后面都是数据，gotSize不再增加
-				SINFO("m\n");
-				recvBuf = (uint8_t *)malloc(dataSize);
-				if(recvBuf == NULL) {
-					SINFO("serial MO ds=%d\n",dataSize);
-					dataSize = 0;
-					idx = 0;
-					ds = 0;
-				}
-				
-				//SINFO("ds=%d\n",dataSize);
-				USART_ClearITPendingBit(USART2, USART_IT_RXNE);
-				return;
-			}
-		}
-		
-		recvBuf[idx] = byte;
-		idx++;
-		//SINFO("%d ", idx);
-		
-		if(idx == dataSize) {
-			SINFO("Finish uartNo=%d ds=%d\n",JM_UART2,dataSize);
-			//Serial_canRecv(false);
-			jm_cli_getJmm()->jm_postEvent(TASK_APP_RX_DATA, dataSize, recvBuf, JM_EVENT_FLAG_FREE_DATA);
-			recvBuf = NULL;
-			dataSize = 0;
-			idx = 0;
-			ds = 0;
-			SINFO("p end\n");
-		}
-		
-		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
-	}
-	
-}
-
-*/
 
 

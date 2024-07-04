@@ -57,7 +57,7 @@ void EXTI1_IRQHandler(void)
 			SINFO("post event\n");
 			lastRunTime = (uint32_t)jm_cli_getSysTime();
 			EXTI_ClearITPendingBit(EXTI_Line1);
-			jm_cli_getJmm()->jm_postEvent(TASK_APP_KEY, 1, NULL, JM_EVENT_FLAG_DEFAULT);
+			jm_cli_getJmm()->jm_postEvent(JM_TASK_APP_KEY, 1, NULL, JM_EVENT_FLAG_DEFAULT);
 			SINFO("post event E\n");
 		} else {
 			lastRunTime = 0;
@@ -84,7 +84,7 @@ void EXTI0_IRQHandler(void)
 		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0){
 			SINFO("post0 event\n");
 			lastRunTime = (uint32_t)jm_cli_getSysTime();
-			//jm_cli_getJmm()->jm_postEvent(TASK_APP_KEY, 1, NULL, JM_EVENT_FLAG_DEFAULT);
+			//jm_cli_getJmm()->jm_postEvent(JM_TASK_APP_KEY, 1, NULL, JM_EVENT_FLAG_DEFAULT);
 		} else {
 			lastRunTime = 0;
 		}

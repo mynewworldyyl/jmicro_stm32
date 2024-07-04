@@ -815,6 +815,16 @@
               <FileType>1</FileType>
               <FilePath>.\jmicro_stm32\jm_stm32_runner.c</FilePath>
             </File>
+            <File>
+              <FileName>jm_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\jmicro_stm32\jm_ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>jm_ctrl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\jmicro_stm32\jm_ctrl.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

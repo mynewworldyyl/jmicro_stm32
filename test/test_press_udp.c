@@ -34,7 +34,7 @@ static ICACHE_FLASH_ATTR BOOL _jm_udp_serialproxy_press_checker() {
 void jm_test_press_udp_init(){
 	SINFO("jm_test_press_udp_init B\n");
 	
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_KEY, _jm_udp_press_stop);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_KEY, _jm_udp_press_stop);
 	
 	jm_cli_registTimerChecker("_pressUdpC",_jm_udp_serialproxy_press_checker,2,5,false);
 	

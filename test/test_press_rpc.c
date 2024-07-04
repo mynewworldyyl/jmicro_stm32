@@ -53,7 +53,7 @@ static ICACHE_FLASH_ATTR void _jm_udp_press_stop(jm_event_t *evt) {
 void jm_test_press_rpc_init(){
 	SINFO("jm_test_press_udp_init B\n");
 	
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_KEY, _jm_udp_press_stop);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_KEY, _jm_udp_press_stop);
 	
 	jm_cli_registTimerChecker("_pressUdpC",_jm_rpc_serialproxy_key_listener,2,5,false);
 	

@@ -13,7 +13,7 @@ static jm_tcp_conn_t *conn = NULL;
 static ICACHE_FLASH_ATTR void _jm_serialproxy_listener(jm_event_t *evt) {
 
 	SINFO("serial lis B subType=%u\n",evt->subType);
-	if(evt->subType == TASK_APP_PROXY_TCP_CONNECTED) {
+	if(evt->subType == JM_TASK_APP_PROXY_TCP_CONNECTED) {
 		jm_tcp_conn_t *c = (jm_tcp_conn_t *)evt->data;
 		SINFO("tcp conn result %s:%u sock=%d\n",c->host?c->host:"N", c->port, c->sock);
 		if(c->sock >= 0) {
@@ -29,7 +29,7 @@ static ICACHE_FLASH_ATTR void _jm_serialproxy_listener(jm_event_t *evt) {
 			jm_cli_getJmm()->jm_free_fn(c,sizeof(jm_tcp_conn_t));
 			conn = NULL;
 		}
-	}else if(evt->subType == TASK_APP_PROXY_TCP_DISCONNECTED) {
+	}else if(evt->subType == JM_TASK_APP_PROXY_TCP_DISCONNECTED) {
 		//conn = (jm_tcp_conn_t *)evt->data;
 		jm_tcp_conn_t *c = (jm_tcp_conn_t *)evt->data;
 		SINFO("tcp disconn result %s:%u sock=%d\n",c->host?conn->host:"N", c->port, c->sock);
@@ -43,7 +43,7 @@ static ICACHE_FLASH_ATTR void _jm_serialproxy_listener(jm_event_t *evt) {
 			jm_cli_getJmm()->jm_free_fn(conn,sizeof(jm_tcp_conn_t));
 			conn = NULL;
 		}
-	}else if(evt->subType == TASK_APP_PROXY_TCP_ERR){
+	}else if(evt->subType == JM_TASK_APP_PROXY_TCP_ERR){
 		jm_tcp_conn_t *c = (jm_tcp_conn_t *)evt->data;
 		SINFO("tcp send fail %s:%u sock=%d\n",c->host?c->host:"N", c->port, c->sock);
 		if(c->host) jm_utils_releaseStr(c->host,0);
@@ -103,10 +103,10 @@ static ICACHE_FLASH_ATTR void _jm_tcp_serialproxy_key_listener(jm_event_t *evt) 
 void jm_test_tcp_init(){
 	
 	//TCP连接相关事件
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_SERIAL, _jm_serialproxy_listener);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_SERIAL, _jm_serialproxy_listener);
 	
 	//按键事件
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_KEY, _jm_tcp_serialproxy_key_listener);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_KEY, _jm_tcp_serialproxy_key_listener);
 	
 	//接收TCP返回数据
 	jm_tcp_setDataCb(_jm_tcp_testOnData);

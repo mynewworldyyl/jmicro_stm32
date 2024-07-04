@@ -96,8 +96,8 @@ static ICACHE_FLASH_ATTR void _jm_ctrl_login_event_listener(jm_event_t *e){
 }
 
 void jm_test_ps_init(){
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_LOGIN_RESULT, _jm_ctrl_login_event_listener);
-	jm_cli_getJmm()->jm_regEventListener(TASK_APP_KEY, _jm_rpc_serialproxy_key_listener);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_LOGIN_RESULT, _jm_ctrl_login_event_listener);
+	jm_cli_getJmm()->jm_regEventListener(JM_TASK_APP_KEY, _jm_rpc_serialproxy_key_listener);
 	//接收本地Wifi环境的消息（内网）
     jm_cli_subscribeByType(_ctrl_onPubsubItemTypeListener, 0, false);
 }

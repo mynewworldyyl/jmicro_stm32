@@ -43,8 +43,8 @@ typedef struct {
     uint8 pad[3];
 } Flag;
 
-#define FS_DEBUG_ENABLE 0
-#define FS_ERROR_ENABLE 0
+#define JM_FS_DEBUG_ENABLE 0
+#define JM_FS_ERROR_ENABLE 0
 
 #if FS_DEBUG_ENABLE==1
 #define JM_FS_DEBUG(format, ...) SINFO(format,## __VA_ARGS__)
@@ -52,7 +52,7 @@ typedef struct {
 #define JM_FS_DEBUG(format, ...)
 #endif
 
-#if FS_ERROR_ENABLE==1
+#if JM_FS_ERROR_ENABLE==1
 #define JM_FS_ERROR(format, ...) SINFO(format,## __VA_ARGS__)
 #else
 #define JM_FS_ERROR(format, ...)

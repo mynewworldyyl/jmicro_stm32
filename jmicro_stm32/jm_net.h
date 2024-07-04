@@ -1,9 +1,7 @@
 #ifndef JM_NET_H_
 #define JM_NET_H_
 
-#define TCP_ENABLE 1
-#define UDP_ENABLE 1
-#define SERIAL_ENABLE 1
+#include "jm_client.h"
 
 #define JM_MAX_SERIAL_BLOCK_SIZE 1024
 
@@ -57,22 +55,35 @@
 #define JM_SERIALNET_TYPE_SERIAL 3 //串口通信
 #define JM_SERIALNET_TYPE_UDP_COM 4 //能用UDP，不处理拆包，组包
 
-#define TASK_APP_PROXY_TCP_CONNECTED (1)  //TCP代理事件字类型 连接成功
-#define TASK_APP_PROXY_TCP_DISCONNECTED (2)  //TCP代理事件字类型 连接断开
-#define TASK_APP_PROXY_TCP_SEND 3 //TCP发送数据结果
-#define TASK_APP_PROXY_TCP_CONN 4 //TCP连接结果
-#define TASK_APP_PROXY_TCP_ERR 5 //TCP连接结果
+#define JM_TASK_APP_PROXY_TCP_CONNECTED (1)  //TCP代理事件字类型 连接成功
+#define JM_TASK_APP_PROXY_TCP_DISCONNECTED (2)  //TCP代理事件字类型 连接断开
+#define JM_TASK_APP_PROXY_TCP_SEND 3 //TCP发送数据结果
+#define JM_TASK_APP_PROXY_TCP_CONN 4 //TCP连接结果
+#define JM_TASK_APP_PROXY_TCP_ERR 5 //TCP连接结果
 
-#define TASK_APP_PROXY_WIFI_CFG 6 //Wifi配网
-#define TASK_APP_PROXY_WIFI_CONNECTED 7 //Wifi连接成功
-#define TASK_APP_PROXY_WIFI_FAIL 8 //Wifi连接失败
-#define TASK_APP_PROXY_WIFI_NET_FAIL 9 //Wifi连接,但互联网访问失败
-#define TASK_APP_PROXY_INTERNET_ENABLE 10 //查询是否可以访问互联网
-#define TASK_APP_PROXY_WIFI_GET_SSID 11 //获取当前连接的Wifi名称
-#define TASK_APP_PROXY_WIFI_IS_ENABLE 12 //Wifi是否可用
-#define TASK_APP_PROXY_HB 13 //网卡心跳
+#define JM_TASK_APP_PROXY_WIFI_CFG 6 //Wifi配网
+#define JM_TASK_APP_PROXY_WIFI_CONNECTED 7 //Wifi连接成功
+#define JM_TASK_APP_PROXY_WIFI_FAIL 8 //Wifi连接失败
+#define JM_TASK_APP_PROXY_WIFI_NET_FAIL 9 //Wifi连接,但互联网访问失败
+#define JM_TASK_APP_PROXY_INTERNET_ENABLE 10 //查询是否可以访问互联网
+#define JM_TASK_APP_PROXY_WIFI_GET_SSID 11 //获取当前连接的Wifi名称
+#define JM_TASK_APP_PROXY_WIFI_IS_ENABLE 12 //Wifi是否可用
+#define JM_TASK_APP_PROXY_HB 13 //网卡心跳
 
-#define TASK_APP_PROXY_TCP_CLOSE 14 //关闭TCP连接
+#define JM_TASK_APP_PROXY_TCP_CLOSE 14 //关闭TCP连接
+#define JM_TASK_APP_PROXY_UID 15 //发送或接收单片机唯一ID
+
+//#define JM_TASK_APP_ML 16 //主从事件
+
+#define JM_TASK_APP_PROXY_LOGIN_RESULT 17 //发送或接收单片机唯一ID
+
+#define JM_TASK_APP_PROXY_BR 18 //允许向外广播或响应广播
+
+#define JM_TASK_APP_PROXY_LOGIN 19 //开始登录JM平台
+
+#define JM_TASK_APP_PROXY_SYS_CFG 20 //下发配置信息
+
+#define JM_TASK_APP_PROXY_TRANS_CMD 21 //下发命令到设备
 
 //TCP连接类型
 typedef int8_t jm_tcp_socket_t;
@@ -141,16 +152,22 @@ BOOL ICACHE_FLASH_ATTR jm_serial_tcpconnect(char *host, uint16_t port);
 BOOL ICACHE_FLASH_ATTR jm_serial_tcpclose(jm_tcp_socket_t sock);
 
 //配置Wifi账号密码
-void ICACHE_FLASH_ATTR jm_serial_configWifiPwd(char *ssid, char *pwd);
-
-//查看连接的Wifi名称，注意中文可能乱码，所以最好Wifi名称不要带中文
-void ICACHE_FLASH_ATTR jm_serial_getWifiSsid();
+void ICACHE_FLASH_ATTR jm_serial_configWifiPwd(char *ssid, char *pwd, jm_cli_rpc_callback_fn cb);
 
 //Wifi是否可用
-BOOL ICACHE_FLASH_ATTR jm_serial_isWifiEnable();
+void ICACHE_FLASH_ATTR jm_serial_isWifiEnable();
 
 //是否可以访问外网
-BOOL ICACHE_FLASH_ATTR jm_serial_isInternetEnable();
+void ICACHE_FLASH_ATTR jm_serial_isInternetEnable();
+
+//网卡可用
+ICACHE_FLASH_ATTR void jm_netcard_connected();
+
+//发送唯一码并了得当前网卡的配置信息
+uint8_t ICACHE_FLASH_ATTR jm_serial_sendUniqueId();
+
+//串口登录
+void ICACHE_FLASH_ATTR jm_serial_login();
 
 /**********************************TCP模块结束********************************************/
 

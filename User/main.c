@@ -25,6 +25,20 @@ int main(void)
 	//初始化
 	jm_setup();
 	
+	//0F003 8000F 32343 03930 3142
+	//0F003 8000F 32343 03930 31423 33433 36303039343436009446
+	uint32_t uid[JM_UNIQUE_ID_LEN/4] = {0};
+	if(get_unique_id(uid)) {
+		char hexStr[JM_UNIQUE_ID_LEN*2+1];
+		jm_toHex((uint8_t*)uid, hexStr, JM_UNIQUE_ID_LEN);
+		//OLED_ShowString(3, 1, hexStr);
+		OLED_ShowNum(3, 1, uid[0],8);
+		SINFO("STM32 UID %s\n",hexStr);
+		SINFO("STM32 UID[0] %d\n",uid[0]);
+	} else {
+		OLED_ShowString(3, 1, "UID Fail");
+	}
+	
 	#if JM_TEST_TCP_ENABLE==1
 	jm_test_tcp_init();
 	#endif
